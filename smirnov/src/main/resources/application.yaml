@@ -1,0 +1,37 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: VitaSoft
+  datasource:
+    url: jdbc:postgresql:${PATH_DB}
+    username: ${LOGIN_POSTGRE}
+    password: ${PASSWORD_POSTGRE}
+  jpa:
+    show: true
+    hibernate:
+      ddl-auto: validate
+    open-in-view: true
+    output:
+      ansi:
+        enabled=ALWAYS:
+  liquibase:
+    enabled: true
+  change-log:
+    classpath: db/changelog/db.changelog-master.yaml
+
+#Размер для пагинации страницы
+page:
+  size: 5
+
+#logging:
+#  level:
+#    root: INFO
+#  file:
+#    name: LogCarWash
+
+
+
+#security:
+#  jwtSecretExpiration: 86400000
+#  jwtSecret: 841D8A6C80CBA4FCAD32D5367C18C53B
