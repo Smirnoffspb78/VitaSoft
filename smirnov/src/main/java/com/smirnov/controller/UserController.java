@@ -1,6 +1,6 @@
 package com.smirnov.controller;
 
-import com.smirnov.dto.response.UserDTO;
+import com.smirnov.dto.get.UserDTO;
 import com.smirnov.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

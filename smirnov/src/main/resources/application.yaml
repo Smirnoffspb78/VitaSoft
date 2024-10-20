@@ -24,11 +24,11 @@ spring:
 page:
   size: 5
 
-#logging:
-#  level:
-#    root: INFO
-#  file:
-#    name: LogCarWash
+logging:
+  level:
+    root: INFO
+  file:
+    name: LogVitaSoft
 
 
 

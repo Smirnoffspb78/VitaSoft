@@ -1,7 +1,7 @@
 package com.smirnov.controller;
 
-import com.smirnov.dto.request.RequestCreateDTO;
-import com.smirnov.dto.response.RequestDTO;
+import com.smirnov.dto.create.RequestCreateDTO;
+import com.smirnov.dto.get.RequestDTO;
 import com.smirnov.services.RequestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,6 +64,8 @@ public class RequestController {
 
     /**
      * Создает новую заявку
+     * Уровень доступа:
+     * - USER
      *
      * @param requestCreateDTO заявка
      * @param userId           Идентификатор пользователя
@@ -81,6 +83,8 @@ public class RequestController {
 
     /**
      * Отправляет заявку на рассмотрение.
+     * Уровень доступа:
+     * - USER, чей id совпадает с User в заявке
      *
      * @param id Идентификатор заявки.
      */
@@ -115,6 +119,22 @@ public class RequestController {
     public void rejectRequest(@PathVariable("id") Long id) {
         log.info("POST: /requests/{}/reject", id);
         requestService.acceptRequest(id);
+        log.info("Заявка с id {} отклонена", id);
+    }
+
+    /**
+     * Редактирует заявку пользователя.
+     * Уровень доступа:
+     * - USER, чей id совпадает с заявкой
+     *
+     * @param id               Идентификатор заявки
+     * @param requestCreateDTO Новая заявка
+     */
+    @PutMapping(value = "/{id}/edit")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void editDraftRequest(@PathVariable("id") Long id, @RequestBody @Valid RequestCreateDTO requestCreateDTO) {
+        log.info("POST: /requests/{}/reject", id);
+        requestService.editDraftRequest(id, requestCreateDTO);
         log.info("Заявка с id {} отклонена", id);
     }
 }
