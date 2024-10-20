@@ -8,5 +8,4 @@ public class DuplicateRoleException extends RuntimeException{
     public DuplicateRoleException(Number id) {
         super(format(MESSAGE, id));
     }
-
 }

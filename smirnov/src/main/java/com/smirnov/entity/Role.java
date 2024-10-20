@@ -35,5 +35,4 @@ public class Role {
     @Enumerated(value = EnumType.STRING)
     @Column(name = "name")
     private RolesUser rolesUser;
-
 }

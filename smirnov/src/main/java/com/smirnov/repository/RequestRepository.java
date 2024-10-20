@@ -8,6 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
+/**
+ * Репозиторий заявок.
+ */
 public interface RequestRepository extends JpaRepository<Request, Long> {
 
     /**
@@ -39,7 +42,7 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
     Page<Request> findByStatus(RequestStatus status, Pageable pageable);
 
     /**
-     * Возвращает страницу всех заявок, по статусу
+     * Возвращает страницу всех заявок, по идентификатору пользователя
      *
      * @param userId   Идентификатор пользователя
      * @param pageable Страница
