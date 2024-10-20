@@ -79,7 +79,7 @@ public class RequestController {
                                                       @RequestParam("sorting") Sort.Direction sorting,
                                                       @PathVariable("name") String name,
                                                       Pageable pageable) {
-        log.info("GET: /requests/{}?page={}&sorting={}", name,page, sorting);
+        log.info("GET: /requests/search/{}?page={}&sorting={}", name,page, sorting);
         Page<RequestDTO> pageFiles = requestService.getPageRequestByName(pageable, sorting, name);
         log.info("{}. Получена страница {} размером {} элементов", HttpStatus.OK, pageable.getPageNumber(), pageable.getPageSize());
         return pageFiles;
