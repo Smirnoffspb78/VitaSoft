@@ -1,0 +1,26 @@
+
+databaseChangeLog:
+  #Создание таблицы ролей
+  - includeAll:
+      path: db/changelog/changeset/1_0/
+  #Создание таблицы пользователей
+  - includeAll:
+      path: db/changelog/changeset/1_1/
+  #Создание таблицы пользователей-ролей
+  - includeAll:
+      path: db/changelog/changeset/1_2/
+  #Создание таблицы заявок
+  - includeAll:
+      path: db/changelog/changeset/1_3/
+  #Добавление ролей в таблицу
+  - includeAll:
+      path: db/changelog/changeset/1_4/
+  #Добавление пользователей в таблицу
+  - includeAll:
+      path: db/changelog/changeset/1_5/
+  #Добавление связей роли-пользователи в таблицу
+  - includeAll:
+      path: db/changelog/changeset/1_6/
+  #Добавление заявок в таблицу
+  - includeAll:
+      path: db/changelog/changeset/1_7/
