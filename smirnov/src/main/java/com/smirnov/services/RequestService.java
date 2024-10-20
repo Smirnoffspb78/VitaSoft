@@ -110,14 +110,26 @@ public class RequestService {
      * @return Список заявок
      */
     public Page<RequestDTO> getPageRequest(Pageable pageable, Sort.Direction sorting) {
-        return requestRepository.findAll(PageRequest.of(pageable.getPageNumber(), size,
+        return requestRepository.findByStatus(SENT,PageRequest.of(pageable.getPageNumber(), size,
                         by(sorting, Request.Fields.createdAt)))
+                .map(this::mapRequestDTO);
+    }
+
+    /**
+     * Возвращает частично список заявок по имени пользователя.
+     *
+     * @return Список заявок
+     */
+    public Page<RequestDTO> getPageRequestByName(Pageable pageable, Sort.Direction sorting, String name) {
+        return requestRepository.findByStatusAndUser_nameContainingIgnoreCase(SENT, name, PageRequest.of(pageable.getPageNumber(), size,
+                by(sorting, Request.Fields.createdAt)))
                 .map(this::mapRequestDTO);
     }
 
     private RequestDTO mapRequestDTO(Request request) {
         return RequestDTO.builder()
                 .userLogin(request.getUser().getLogin())
+                .userName(request.getUser().getName())
                 .message(request.getMessage())
                 .status(request.getStatus().toString())
                 .createdAt(request.getCreatedAt())

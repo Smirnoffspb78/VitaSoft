@@ -44,6 +44,7 @@ public class RequestController {
      * @return Заявка
      */
     @GetMapping(value = "/{id}")
+    @PreAuthorize("hasRole('ROLE_OPERATOR')")
     public RequestDTO watchRequest(@PathVariable("id") Long id) {
         log.info("POST: /{}", id);
         RequestDTO requestDTO = requestService.getRequest(id);
@@ -52,16 +53,34 @@ public class RequestController {
     }
 
     /**
-     * Возвращает страницу с заявками.
+     * Возвращает страницу с заявками, направленных на рассмотрение.
      *
      * @return Список DTO записей
      */
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_OPERATOR')")
     public Page<RequestDTO> getPageRequest(@RequestParam("page") int page,
                                            @RequestParam("sorting") Sort.Direction sorting,
                                            Pageable pageable) {
-        log.info("GET: /file?page={}", page);
+        log.info("GET: /requests?page={}&sorting={}", page, sorting);
         Page<RequestDTO> pageFiles = requestService.getPageRequest(pageable, sorting);
+        log.info("{}. Получена страница {} размером {} элементов", HttpStatus.OK, pageable.getPageNumber(), pageable.getPageSize());
+        return pageFiles;
+    }
+
+    /**
+     * Возвращает страницу с заявками, направленные на рассмотрение.
+     *
+     * @return Список DTO записей
+     */
+    @GetMapping("/search/{name}")
+    @PreAuthorize("hasRole('ROLE_OPERATOR')")
+    public Page<RequestDTO> getPageRequestBysUserName(@RequestParam("page") int page,
+                                                      @RequestParam("sorting") Sort.Direction sorting,
+                                                      @PathVariable("name") String name,
+                                                      Pageable pageable) {
+        log.info("GET: /requests/{}?page={}&sorting={}", name,page, sorting);
+        Page<RequestDTO> pageFiles = requestService.getPageRequestByName(pageable, sorting, name);
         log.info("{}. Получена страница {} размером {} элементов", HttpStatus.OK, pageable.getPageNumber(), pageable.getPageSize());
         return pageFiles;
     }
@@ -87,7 +106,7 @@ public class RequestController {
     }
 
     /**
-     * Отправляет заявку на рассмотрение, если она в статусе DRAFT.
+     * Отправляет заявку на рассмотрение, если она в статусе DRAFT по ее идентификатору.
      * Уровень доступа:
      * - USER, чей id совпадает с User в заявке
      *
@@ -103,12 +122,13 @@ public class RequestController {
     }
 
     /**
-     * Отправляет заявку на рассмотрение.
+     * Принимает заявку по ее идентификатору.
      *
      * @param id Идентификатор заявки.
      */
     @PutMapping(value = "/{id}/accept")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ROLE_OPERATOR')")
     public void acceptRequest(@PathVariable("id") Long id) {
         log.info("POST: /requests/{}/accept", id);
         requestService.acceptRequest(id);
@@ -122,6 +142,7 @@ public class RequestController {
      */
     @PutMapping(value = "/{id}/reject")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ROLE_OPERATOR')")
     public void rejectRequest(@PathVariable("id") Long id) {
         log.info("POST: /requests/{}/reject", id);
         requestService.acceptRequest(id);

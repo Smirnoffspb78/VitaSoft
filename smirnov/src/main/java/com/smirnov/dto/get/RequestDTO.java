@@ -21,6 +21,11 @@ public class RequestDTO {
     private String userLogin;
 
     /**
+     * Имя пользователя.
+     */
+    private String userName;
+
+    /**
      * Статус заявки.
      */
     private String status;

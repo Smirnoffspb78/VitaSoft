@@ -10,6 +10,6 @@ values (1, 'ROLE_USER'),
        (2, 'ROLE_USER'),
        (3, 'ROLE_USER'),
        (4, 'ROLE_USER'),
-       (5, 'ROLE_USER'),
+       (5, 'ROLE_OPERATOR'),
        (6, 'ROLE_ADMIN'),
-       (7, 'ROLE_USER');
+       (7, 'ROLE_OPERATOR');
