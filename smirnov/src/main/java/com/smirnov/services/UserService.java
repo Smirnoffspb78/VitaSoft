@@ -43,7 +43,9 @@ public class UserService implements UserDetailsService {
      */
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(user -> UserDTO.builder().login(user.getLogin())
+                .map(user -> UserDTO.builder()
+                        .login(user.getLogin())
+                        .name(user.getName())
                         .rolesUser(user.getRolesUser().stream()
                                 .map(Role::toString)
                                 .collect(Collectors.toSet()))
@@ -87,7 +89,6 @@ public class UserService implements UserDetailsService {
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
         log.info("Аутентифицирован user с login: {}. Роль: {}", user.getLogin(), grantedAuthorities);
-        UserDetailsCustom userDetailsCustom = new UserDetailsCustom(username, user.getPassword(), grantedAuthorities, user.getId());
-        return userDetailsCustom;
+        return new UserDetailsCustom(username, user.getPassword(), grantedAuthorities, user.getId());
     }
 }
