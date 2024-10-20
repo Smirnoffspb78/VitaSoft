@@ -1,6 +1,7 @@
 package com.smirnov.controller;
 
 
+import com.smirnov.exception.DuplicateRoleException;
 import com.smirnov.exception.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -23,7 +24,7 @@ public class ExceptionHandlerAdvice {
     @ResponseBody
     @ExceptionHandler({EntityNotFoundException.class, HttpRequestMethodNotSupportedException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String entityException(RuntimeException e) {
+    public String notFoundExceptionException(RuntimeException e) {
         return responseServer(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
@@ -35,6 +36,13 @@ public class ExceptionHandlerAdvice {
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.joining("\n", "\n", ""));
         return responseServer(HttpStatus.BAD_REQUEST, errorMessages);
+    }
+
+    @ResponseBody
+    @ExceptionHandler(DuplicateRoleException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String badRequestException(RuntimeException e) {
+        return responseServer(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
     private String responseServer(HttpStatus httpStatus, String message) {
