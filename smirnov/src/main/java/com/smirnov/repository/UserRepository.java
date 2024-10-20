@@ -16,4 +16,12 @@ public interface UserRepository extends CrudRepository<User, Integer> {
      * @return Пользователь
      */
     Optional<User> findByLogin(String login);
+
+    /**
+     * Ищет пользователей по имени или части имени.
+     *
+     * @param name Часть или полное имя пользователя.
+     * @return Список пользователей, чьи имена содержат переданное значение.
+     */
+    /*List<User> findByNameContainingIgnoreCase(String name);*/
 }

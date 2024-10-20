@@ -17,6 +17,11 @@ public class UserDTO {
     private String login;
 
     /**
+     * Имя.
+     */
+    private String name;
+
+    /**
      * Роли пользователя
      */
     private Set<String> rolesUser;

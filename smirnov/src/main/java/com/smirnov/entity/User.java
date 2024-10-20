@@ -51,6 +51,13 @@ public class User {
     private String password;
 
     /**
+     * Имя.
+     */
+    @Pattern(regexp = "[A-ZА-Я][A-zА-я-]{0,199}", message = "Имя должно начинаться с заглавной латинской или русской буквы. Имя может содержать символ \"-\"")
+    @Column(name = "name")
+    private String name;
+
+    /**
      * Роли пользователя
      */
     @NotEmpty(message = "rolesUser не должен быть пустым")
