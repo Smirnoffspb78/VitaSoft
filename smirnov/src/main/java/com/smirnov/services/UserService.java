@@ -86,6 +86,7 @@ public class UserService implements UserDetailsService {
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
         log.info("Аутентифицирован user с login: {}. Роль: {}", user.getLogin(), grantedAuthorities);
-        return new UserDetailsCustom(username, user.getPassword(), grantedAuthorities, user.getId());
+        UserDetailsCustom userDetailsCustom = new UserDetailsCustom(username, user.getPassword(), grantedAuthorities, user.getId());
+        return userDetailsCustom;
     }
 }
