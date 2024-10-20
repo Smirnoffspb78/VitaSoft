@@ -9,9 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +21,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 
 @RestController
 @RequestMapping("/requests")
@@ -63,9 +60,9 @@ public class RequestController {
                                            @RequestParam("sorting") Sort.Direction sorting,
                                            Pageable pageable) {
         log.info("GET: /requests?page={}&sorting={}", page, sorting);
-        Page<RequestDTO> pageFiles = requestService.getPageRequest(pageable, sorting);
+        Page<RequestDTO> pageRequest = requestService.getPageRequest(pageable, sorting);
         log.info("{}. Получена страница {} размером {} элементов", HttpStatus.OK, pageable.getPageNumber(), pageable.getPageSize());
-        return pageFiles;
+        return pageRequest;
     }
 
     /**
@@ -80,9 +77,26 @@ public class RequestController {
                                                       @PathVariable("name") String name,
                                                       Pageable pageable) {
         log.info("GET: /requests/search/{}?page={}&sorting={}", name,page, sorting);
-        Page<RequestDTO> pageFiles = requestService.getPageRequestByName(pageable, sorting, name);
+        Page<RequestDTO> pageRequest = requestService.getPageRequestByName(pageable, sorting, name);
         log.info("{}. Получена страница {} размером {} элементов", HttpStatus.OK, pageable.getPageNumber(), pageable.getPageSize());
-        return pageFiles;
+        return pageRequest;
+    }
+
+    /**
+     * Возвращает страницу с заявками, направленные на рассмотрение.
+     *
+     * @return Список DTO записей
+     */
+    @GetMapping("/search/user/{id}")
+    @PreAuthorize("hasRole('ROLE_USER') and authentication.principal.id == #userId")
+    public Page<RequestDTO> getPageByUser(@RequestParam("page") int page,
+                                                      @RequestParam("sorting") Sort.Direction sorting,
+                                                      @PathVariable("id") Integer userId,
+                                                      Pageable pageable) {
+        log.info("GET: /requests/search/{}?page={}&sorting={}", userId,page, sorting);
+        Page<RequestDTO> pageRequest = requestService.getAllByUser(pageable, sorting, userId);
+        log.info("{}. Получена страница {} размером {} элементов", HttpStatus.OK, pageable.getPageNumber(), pageable.getPageSize());
+        return pageRequest;
     }
 
     /**
@@ -145,7 +159,7 @@ public class RequestController {
     @PreAuthorize("hasRole('ROLE_OPERATOR')")
     public void rejectRequest(@PathVariable("id") Long id) {
         log.info("POST: /requests/{}/reject", id);
-        requestService.acceptRequest(id);
+        requestService.rejectRequest(id);
         log.info("Заявка с id {} отклонена", id);
     }
 

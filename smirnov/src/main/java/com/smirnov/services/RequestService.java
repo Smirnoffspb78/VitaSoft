@@ -5,6 +5,7 @@ import com.smirnov.dto.get.RequestDTO;
 import com.smirnov.entity.Request;
 import com.smirnov.entity.User;
 import com.smirnov.enums.RequestStatus;
+import com.smirnov.enums.RolesUser;
 import com.smirnov.exception.EntityNotFoundException;
 import com.smirnov.repository.RequestRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,8 @@ import static com.smirnov.enums.RequestStatus.ACCEPTED;
 import static com.smirnov.enums.RequestStatus.DRAFT;
 import static com.smirnov.enums.RequestStatus.REJECTED;
 import static com.smirnov.enums.RequestStatus.SENT;
+import static com.smirnov.enums.RolesUser.ROLE_OPERATOR;
+import static com.smirnov.enums.RolesUser.ROLE_USER;
 import static org.springframework.data.domain.Sort.by;
 
 /**
@@ -80,7 +83,7 @@ public class RequestService {
      */
     public RequestDTO getRequest(Long id) {
         Request request = requestRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Request.class, id));
-        return mapRequestDTO(request);
+        return mapRequestDTO(request, ROLE_OPERATOR);
     }
 
     /**
@@ -105,32 +108,47 @@ public class RequestService {
     }
 
     /**
-     * Возвращает частично список заявок.
+     * Возвращает частично список заявок, отправленных на рассмотрение.
      *
      * @return Список заявок
      */
     public Page<RequestDTO> getPageRequest(Pageable pageable, Sort.Direction sorting) {
-        return requestRepository.findByStatus(SENT,PageRequest.of(pageable.getPageNumber(), size,
+        return requestRepository.findByStatus(SENT, PageRequest.of(pageable.getPageNumber(), size,
                         by(sorting, Request.Fields.createdAt)))
-                .map(this::mapRequestDTO);
+                .map(request -> mapRequestDTO(request, ROLE_OPERATOR));
     }
 
     /**
-     * Возвращает частично список заявок по имени пользователя.
+     * Возвращает частично список заявок по имени пользователя, отправленных на рассмотрение.
      *
      * @return Список заявок
      */
     public Page<RequestDTO> getPageRequestByName(Pageable pageable, Sort.Direction sorting, String name) {
-        return requestRepository.findByStatusAndUser_nameContainingIgnoreCase(SENT, name, PageRequest.of(pageable.getPageNumber(), size,
-                by(sorting, Request.Fields.createdAt)))
-                .map(this::mapRequestDTO);
+        return requestRepository
+                .findByStatusAndUser_nameContainingIgnoreCase(SENT, name, PageRequest.of(pageable.getPageNumber(), size,
+                        by(sorting, Request.Fields.createdAt)))
+                .map(request -> mapRequestDTO(request, ROLE_OPERATOR));
     }
 
-    private RequestDTO mapRequestDTO(Request request) {
+    /**
+     * Возвращает частично заявки пользователя по его идентификатору.
+     *
+     * @return Список заявок
+     */
+    public Page<RequestDTO> getAllByUser(Pageable pageable, Sort.Direction sorting, Integer userId) {
+        return requestRepository
+                .findByUser_id(userId, PageRequest.of(pageable.getPageNumber(), size,
+                        by(sorting, Request.Fields.createdAt)))
+                .map(request -> mapRequestDTO(request, ROLE_USER));
+    }
+
+    private RequestDTO mapRequestDTO(Request request, RolesUser rolesUser) {
+        User user = request.getUser();
+        String message = rolesUser == ROLE_OPERATOR ? mapMessage(request.getMessage()) : request.getMessage();
         return RequestDTO.builder()
-                .userLogin(request.getUser().getLogin())
-                .userName(request.getUser().getName())
-                .message(request.getMessage())
+                .userLogin(user.getLogin())
+                .userName(user.getName())
+                .message(message)
                 .status(request.getStatus().toString())
                 .createdAt(request.getCreatedAt())
                 .build();
@@ -140,5 +158,17 @@ public class RequestService {
     private Request getRequestIdStatus(Long id, RequestStatus requestStatus) {
         return requestRepository.findByIdAndStatus(id, requestStatus)
                 .orElseThrow(() -> new EntityNotFoundException(Request.class, id));
+    }
+
+    private String mapMessage(String message) {
+        StringBuilder operatorMessage = new StringBuilder();
+        for (int i = 0; i < message.length(); i++) {
+            char currentChar = message.charAt(i);
+            operatorMessage.append(currentChar);
+            if (i != message.length() - 1) {
+                operatorMessage.append("-");
+            }
+        }
+        return operatorMessage.toString();
     }
 }

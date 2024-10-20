@@ -29,26 +29,31 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
      */
     Optional<Request> findByIdAndStatus(Long id, RequestStatus status);
 
-
     /**
-     * Возвращает страницу всех заявок, по имени/части имени и статусу
-     * @param name Имя/Часть имени
-     * @param status Статус заявки
+     * Возвращает страницу всех заявок, по статусу
+     *
+     * @param status   Статус заявки
      * @param pageable Страница
      * @return Страница с заявками
      */
-    Page<Request> findByStatusAndUser_nameContainingIgnoreCase(
-            RequestStatus status,
-            String name,
-            Pageable pageable);
+    Page<Request> findByStatus(RequestStatus status, Pageable pageable);
 
     /**
      * Возвращает страницу всех заявок, по статусу
-     * @param status Статус заявки
+     *
+     * @param userId   Идентификатор пользователя
      * @param pageable Страница
      * @return Страница с заявками
      */
-    Page<Request> findByStatus(
-            RequestStatus status,
-            Pageable pageable);
+    Page<Request> findByUser_id(Integer userId, Pageable pageable);
+
+    /**
+     * Возвращает страницу всех заявок, по имени/части имени и статусу
+     *
+     * @param name     Имя/Часть имени
+     * @param status   Статус заявки
+     * @param pageable Страница
+     * @return Страница с заявками
+     */
+    Page<Request> findByStatusAndUser_nameContainingIgnoreCase(RequestStatus status, String name, Pageable pageable);
 }
