@@ -9,6 +9,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 
 @RestController
 @RequestMapping("/requests")
@@ -73,16 +77,17 @@ public class RequestController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ROLE_USER') and authentication.principal.id == #userId")
     public Long createRequest(@RequestBody @Valid RequestCreateDTO requestCreateDTO,
                               @RequestParam(name = "userId") Integer userId) {
         log.info("POST: /requests?userId={}", userId);
-        Long requestId = requestService.createRequest(requestCreateDTO);
+        Long requestId = requestService.createRequest(requestCreateDTO.getMessage(), userId);
         log.info("{}. Заявка с id {} создана", HttpStatus.CREATED, requestId);
         return requestId;
     }
 
     /**
-     * Отправляет заявку на рассмотрение.
+     * Отправляет заявку на рассмотрение, если она в статусе DRAFT.
      * Уровень доступа:
      * - USER, чей id совпадает с User в заявке
      *
@@ -90,9 +95,10 @@ public class RequestController {
      */
     @PutMapping(value = "/{id}/submit-review")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void submitReview(@PathVariable("id") Long id) {
-        log.info("POST: /requests/{}/submit-review", id);
-        requestService.submitRequestReview(id);
+    @PreAuthorize("hasRole('ROLE_USER') and authentication.principal.id == #userId")
+    public void submitReview(@PathVariable("id") Long id, @RequestParam(name = "userId") Integer userId) {
+        log.info("POST: /requests/{}/submit-review/?userid={}", id, userId);
+        requestService.submitRequestReview(id, userId);
         log.info("{}. Заявка с id {} отправлена на рассмотрение", HttpStatus.NO_CONTENT, id);
     }
 
@@ -110,7 +116,7 @@ public class RequestController {
     }
 
     /**
-     * Отправляет заявку на рассмотрение.
+     * Отклоняет заявку по ее идентификатору.
      *
      * @param id Идентификатор заявки.
      */
@@ -132,9 +138,11 @@ public class RequestController {
      */
     @PutMapping(value = "/{id}/edit")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void editDraftRequest(@PathVariable("id") Long id, @RequestBody @Valid RequestCreateDTO requestCreateDTO) {
-        log.info("POST: /requests/{}/reject", id);
-        requestService.editDraftRequest(id, requestCreateDTO);
-        log.info("Заявка с id {} отклонена", id);
+    @PreAuthorize("hasRole('ROLE_USER') and authentication.principal.id == #userId")
+    public void editDraftRequest(@PathVariable("id") Long id, @RequestBody @Valid RequestCreateDTO requestCreateDTO,
+                                 @RequestParam(name = "userId") Integer userId) {
+        log.info("POST: /requests/{}/edit?userId={}", id, userId);
+        requestService.editDraftRequest(id, requestCreateDTO, userId);
+        log.info("Заявка с id {} изменена", id);
     }
 }

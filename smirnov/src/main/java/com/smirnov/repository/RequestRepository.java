@@ -9,8 +9,19 @@ import java.util.Optional;
 public interface RequestRepository extends JpaRepository<Request, Long> {
 
     /**
+     * Возвращает заявку по идентификатору, статусу заявки и идентификатору пользователя
+     *
+     * @param id     Идентификатор заявки
+     * @param status Статус заявки
+     * @param userId Идентификатор пользователя
+     * @return Заявка
+     */
+    Optional<Request> findByIdAndStatusAndUser_Id(Long id, RequestStatus status, Integer userId);
+
+    /**
      * Возвращает заявку по идентификатору и статусу заявки
-     * @param id Идентификатор заявки
+     *
+     * @param id     Идентификатор заявки
      * @param status Статус заявки
      * @return Заявка
      */

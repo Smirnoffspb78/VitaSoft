@@ -46,8 +46,9 @@ public class RequestService {
     /**
      * Отправляет заявку на рассмотрение по ее идентификатору.
      */
-    public void submitRequestReview(Long id) {
-        Request request = getRequestIdStatus(id, DRAFT);
+    public void submitRequestReview(Long id, Integer userId) {
+        Request request = requestRepository.findByIdAndStatusAndUser_Id(id, DRAFT, userId)
+                .orElseThrow(() -> new EntityNotFoundException(Request.class, id));
         request.setStatus(SENT);
     }
 
@@ -85,21 +86,21 @@ public class RequestService {
     /**
      * Создает новую заявку.
      *
-     * @param requestCreateDTO информация о заявке
      * @return Идентификатор созданной заявки
      */
-    public Long createRequest(RequestCreateDTO requestCreateDTO) {
-        final User user = userService.getUserById(requestCreateDTO.getUserId());
+    public Long createRequest(String message, Integer userId) {
+        final User user = userService.getUserById(userId);
         Request request = new Request();
-        request.setMessage(requestCreateDTO.getMessage());
+        request.setMessage(message);
         request.setUser(user);
         request.setStatus(DRAFT);
         request.setCreatedAt(LocalDateTime.now());
         return requestRepository.save(request).getId();
     }
 
-    public void editDraftRequest(Long id, RequestCreateDTO requestCreateDTO) {
-        Request request = getRequestIdStatus(id, DRAFT);
+    public void editDraftRequest(Long id, RequestCreateDTO requestCreateDTO, Integer userId) {
+        Request request = requestRepository.findByIdAndStatusAndUser_Id(id, DRAFT, userId)
+                .orElseThrow(() -> new EntityNotFoundException(Request.class, id));
         request.setMessage(requestCreateDTO.getMessage());
     }
 
