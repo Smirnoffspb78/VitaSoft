@@ -12,17 +12,24 @@ import com.nimbusds.jose.proc.JWEKeySelector;
 import com.nimbusds.jose.proc.SimpleSecurityContext;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class JWTConfiguration {
 
-    //@Value("${security.jwtSecret}")
-    private String jwtSecret = "841D8A6C80CBA4FCAD32D5367C18C53B";
+    /**
+     * Неизменяемая часть токена.
+     */
+    private final String jwtSecret;
+
+    public JWTConfiguration(@Value("${security.jwtSecret}") String jwtSecret) {
+        this.jwtSecret = jwtSecret;
+    }
 
     @Bean
-    public JWEEncrypter encrypter() throws KeyLengthException {
+    public JWEEncrypter encrypt() throws KeyLengthException {
         return new DirectEncrypter(jwtSecret.getBytes());
     }
 

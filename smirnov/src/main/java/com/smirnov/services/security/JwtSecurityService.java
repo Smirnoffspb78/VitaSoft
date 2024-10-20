@@ -14,6 +14,7 @@ import com.smirnov.configuration.JWTConfiguration;
 import com.smirnov.dto.get.UserDetailsCustom;
 import com.smirnov.enums.RolesUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -25,13 +26,19 @@ import java.util.UUID;
  * Сервисный слой для генерации токена/
  */
 @Service
-@RequiredArgsConstructor
 public class JwtSecurityService {
 
     private final JWTConfiguration jwtConfiguration;
 
-    //@Value("${security.jwtSecretExpiration}")
-    private long jwtSecretExpiration = 86400000;
+    /**
+     * Время жизни токена.
+     */
+    private final long jwtSecretExpiration;
+
+    public JwtSecurityService(JWTConfiguration jwtConfiguration, @Value("${security.jwtSecretExpiration}") long jwtSecretExpiration) {
+        this.jwtConfiguration = jwtConfiguration;
+        this.jwtSecretExpiration = jwtSecretExpiration;
+    }
 
     /**
      * Генерирует токен для обновления
@@ -60,7 +67,7 @@ public class JwtSecurityService {
                                 .issueTime(new Date()) // время выдачи токена
                                 .expirationTime(new Date(System.currentTimeMillis() + jwtSecretExpiration * 10000))
                                 .build().toJSONObject()));
-        jweObject.encrypt(jwtConfiguration.encrypter());
+        jweObject.encrypt(jwtConfiguration.encrypt());
         return jweObject.serialize();
     }
 
