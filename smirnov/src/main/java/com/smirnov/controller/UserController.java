@@ -38,6 +38,21 @@ public class UserController {
         return users;
     }
 
+    /**
+     * Выводит список пользователей.
+     * Уровень доступа:
+     * - ADMIN
+     * @return Список пользователей
+     */
+    @GetMapping("{name}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public List<UserDTO> getUsersByName(@PathVariable(name = "name") String name){
+        log.info("GET: /users");
+        List <UserDTO> users = userService.getUsersByName(name);
+        log.info("{}. Получен список всех пользователей", HttpStatus.OK);
+        return users;
+    }
+
     @PutMapping("{id}/issue-operator-right")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ROLE_ADMIN')")

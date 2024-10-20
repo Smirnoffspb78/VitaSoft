@@ -67,5 +67,11 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+			<version>3.8.9</version> <!-- Подходит для Spring Boot 2.1 -->
+		</dependency>
 	</dependencies>
 </project>

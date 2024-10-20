@@ -10,7 +10,7 @@ spring:
   jpa:
     show: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
     open-in-view: true
     output:
       ansi:

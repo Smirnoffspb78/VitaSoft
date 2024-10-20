@@ -18,10 +18,10 @@ public interface UserRepository extends CrudRepository<User, Integer> {
     Optional<User> findByLogin(String login);
 
     /**
-     * Ищет пользователей по имени или части имени.
+     * Возвращает список имен по переданному имени/части имени
      *
-     * @param name Часть или полное имя пользователя.
+     * @param name имя/части имени
      * @return Список пользователей, чьи имена содержат переданное значение.
      */
-    /*List<User> findByNameContainingIgnoreCase(String name);*/
+    List<User> findByNameContainingIgnoreCase(String name);
 }

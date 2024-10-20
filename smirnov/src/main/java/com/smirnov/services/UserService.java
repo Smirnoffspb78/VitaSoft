@@ -43,14 +43,19 @@ public class UserService implements UserDetailsService {
      */
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(user -> UserDTO.builder()
-                        .login(user.getLogin())
-                        .name(user.getName())
-                        .rolesUser(user.getRolesUser().stream()
-                                .map(Role::toString)
-                                .collect(Collectors.toSet()))
-                        .build()
-                ).collect(Collectors.toList());
+                .map(this::mapUser)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Возвращает список всех пользователей.
+     *
+     * @return список пользователей
+     */
+    public List<UserDTO> getUsersByName(String name) {
+        return userRepository.findByNameContainingIgnoreCase(name).stream()
+                .map(this::mapUser)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -90,5 +95,15 @@ public class UserService implements UserDetailsService {
                 .collect(Collectors.toSet());
         log.info("Аутентифицирован user с login: {}. Роль: {}", user.getLogin(), grantedAuthorities);
         return new UserDetailsCustom(username, user.getPassword(), grantedAuthorities, user.getId());
+    }
+
+    private UserDTO mapUser(User user){
+        return UserDTO.builder()
+                .login(user.getLogin())
+                .name(user.getName())
+                .rolesUser(user.getRolesUser().stream()
+                        .map(Role::toString)
+                        .collect(Collectors.toSet()))
+                .build();
     }
 }
