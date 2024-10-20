@@ -4,6 +4,7 @@ import com.smirnov.dto.get.UserDTO;
 import com.smirnov.dto.get.UserDetailsCustom;
 import com.smirnov.entity.Role;
 import com.smirnov.entity.User;
+import com.smirnov.exception.DuplicateRoleException;
 import com.smirnov.exception.EntityNotFoundException;
 import com.smirnov.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -56,12 +57,12 @@ public class UserService implements UserDetailsService {
      *
      * @param id идентификатор пользователя
      */
-    public void updateUserBeforeOperator(Integer id) {
+    public void addOperatorRight(Integer id) {
         Role role = new Role();
         role.setRolesUser(ROLE_OPERATOR);
         User user = getUserById(id);
         if (user.getRolesUser().contains(role)) {
-            throw new IllegalArgumentException("Пользователь уже имеет роль оператора");
+            throw new DuplicateRoleException(id);
         }
         user.getRolesUser().add(role);
     }
