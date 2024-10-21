@@ -29,6 +29,7 @@ public class UserAuthenticatedService implements UserDetailsService {
      * @return пользователь в контексте Spring Security
      */
     @Override
+    @Transactional(readOnly = true)
     public UserDetailsCustom loadUserByUsername(String username) {
         User user = userService.getUserByLogin(username);
         Set<GrantedAuthority> grantedAuthorities = user.getRolesUser().stream()

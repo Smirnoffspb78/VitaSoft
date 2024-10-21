@@ -98,16 +98,6 @@ public class JwtSecurityService {
         return claims.getSubject();
     }
 
-    public UserRight getRoles(String token) throws BadJOSEException, ParseException, JOSEException {
-        JWTClaimsSet claims = extractClaims(token);
-        return UserRight.valueOf(claims.getClaim("roles").toString());
-    }
-
-    public Object getId(String token) throws BadJOSEException, ParseException, JOSEException {
-        JWTClaimsSet claims = extractClaims(token);
-        return claims.getClaim("id");
-    }
-
     /**
      * Проверяет токен на валидность.
      *

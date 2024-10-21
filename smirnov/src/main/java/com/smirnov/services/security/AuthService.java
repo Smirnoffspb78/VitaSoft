@@ -20,7 +20,7 @@ import static org.springframework.security.core.context.SecurityContextHolder.ge
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class UserAccountService {
+public class AuthService {
     private final JwtSecurityService jwtSecurityService;
     private final AuthenticationManager authenticationManager;
 

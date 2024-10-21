@@ -1,5 +1,7 @@
 package com.smirnov.entity;
 
+import com.smirnov.enums.UserRight;
+import com.smirnov.exception.DuplicateRoleException;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,6 +18,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import java.util.HashSet;
 import java.util.Set;
+
+import static com.smirnov.enums.UserRight.ROLE_OPERATOR;
 
 /**
  * Пользователь.
@@ -64,4 +68,17 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_name"))
     private Set<UserRole> rolesUser = new HashSet<>();
+
+    /**
+     * Добавляет новую роль пользователю.
+     * @param userRight Роль пользователя
+     */
+    public void addRole(UserRight userRight){
+        UserRole userRole = new UserRole();
+        userRole.setUserRight(userRight);
+        if (rolesUser.contains(userRole)) {
+            throw new DuplicateRoleException(id);
+        }
+        rolesUser.add(userRole);
+    }
 }

@@ -4,6 +4,7 @@ import com.smirnov.dto.create.RequestCreateDTO;
 import com.smirnov.dto.get.RequestDTO;
 import com.smirnov.entity.Request;
 import com.smirnov.entity.User;
+import com.smirnov.entity.UserRole;
 import com.smirnov.enums.RequestStatus;
 import com.smirnov.enums.UserRight;
 import com.smirnov.exception.EntityNotFoundException;
@@ -50,7 +51,7 @@ public class RequestService {
      * Отправляет заявку на рассмотрение по ее идентификатору.
      */
     public void submitRequestReview(Long id, Integer userId) {
-        Request request = requestRepository.findByIdAndStatusAndUser_Id(id, DRAFT, userId)
+        Request request = requestRepository.findByIdAndStatusAndUser_id(id, DRAFT, userId)
                 .orElseThrow(() -> new EntityNotFoundException(Request.class, id));
         request.setStatus(SENT);
     }
@@ -81,6 +82,7 @@ public class RequestService {
      * @param id Идентификатор заявки
      * @return Заявка
      */
+    @Transactional(readOnly = true)
     public RequestDTO getRequest(Long id) {
         Request request = requestRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Request.class, id));
         return mapRequestDTO(request, ROLE_OPERATOR);
@@ -101,8 +103,14 @@ public class RequestService {
         return requestRepository.save(request).getId();
     }
 
+    /**
+     * Редактирует заявку по ее идентификатору.
+     * @param id Идентификатор заявки
+     * @param requestCreateDTO заявка
+     * @param userId идентификатор пользователя
+     */
     public void editDraftRequest(Long id, RequestCreateDTO requestCreateDTO, Integer userId) {
-        Request request = requestRepository.findByIdAndStatusAndUser_Id(id, DRAFT, userId)
+        Request request = requestRepository.findByIdAndStatusAndUser_id(id, DRAFT, userId)
                 .orElseThrow(() -> new EntityNotFoundException(Request.class, id));
         request.setMessage(requestCreateDTO.getMessage());
     }
@@ -112,6 +120,7 @@ public class RequestService {
      *
      * @return Список заявок
      */
+    @Transactional(readOnly = true)
     public Page<RequestDTO> getPageRequest(Pageable pageable, Sort.Direction sorting) {
         return requestRepository.findByStatus(SENT, PageRequest.of(pageable.getPageNumber(), size,
                         by(sorting, Request.Fields.createdAt)))
@@ -123,6 +132,7 @@ public class RequestService {
      *
      * @return Список заявок
      */
+    @Transactional(readOnly = true)
     public Page<RequestDTO> getPageRequestByName(Pageable pageable, Sort.Direction sorting, String name) {
         return requestRepository
                 .findByStatusAndUser_nameContainingIgnoreCase(SENT, name, PageRequest.of(pageable.getPageNumber(), size,
@@ -135,6 +145,7 @@ public class RequestService {
      *
      * @return Список заявок
      */
+    @Transactional(readOnly = true)
     public Page<RequestDTO> getAllByUser(Pageable pageable, Sort.Direction sorting, Integer userId) {
         return requestRepository
                 .findByUser_id(userId, PageRequest.of(pageable.getPageNumber(), size,
@@ -144,11 +155,10 @@ public class RequestService {
 
     private RequestDTO mapRequestDTO(Request request, UserRight userRight) {
         User user = request.getUser();
-        String message = userRight == ROLE_OPERATOR ? mapMessage(request.getMessage()) : request.getMessage();
         return RequestDTO.builder()
                 .userLogin(user.getLogin())
                 .userName(user.getName())
-                .message(message)
+                .message(userRight.getTextRequest(request.getMessage()))
                 .status(request.getStatus().toString())
                 .createdAt(request.getCreatedAt())
                 .build();
@@ -158,17 +168,5 @@ public class RequestService {
     private Request getRequestIdStatus(Long id, RequestStatus requestStatus) {
         return requestRepository.findByIdAndStatus(id, requestStatus)
                 .orElseThrow(() -> new EntityNotFoundException(Request.class, id));
-    }
-
-    private String mapMessage(String message) {
-        StringBuilder operatorMessage = new StringBuilder();
-        for (int i = 0; i < message.length(); i++) {
-            char currentChar = message.charAt(i);
-            operatorMessage.append(currentChar);
-            if (i != message.length() - 1) {
-                operatorMessage.append("-");
-            }
-        }
-        return operatorMessage.toString();
     }
 }

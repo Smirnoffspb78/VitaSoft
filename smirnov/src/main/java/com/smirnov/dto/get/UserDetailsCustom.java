@@ -1,7 +1,6 @@
 package com.smirnov.dto.get;
 
 import com.smirnov.enums.UserRight;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,10 +12,8 @@ import java.util.stream.Collectors;
 
 @Getter
 @ToString
-@EqualsAndHashCode(callSuper = false)
 public class UserDetailsCustom extends User {
 
-    @EqualsAndHashCode.Include
     private final Integer id;
     private final Set<UserRight> userRight;
 
@@ -29,7 +26,7 @@ public class UserDetailsCustom extends User {
      */
     public UserDetailsCustom(String username, String password, Collection<? extends GrantedAuthority> authorities, Integer id) {
         super(username, password, authorities);
-        if (authorities.isEmpty()){
+        if (authorities != null && authorities.isEmpty()) {
             throw new IllegalArgumentException("Список ролей не может быть пустым");
         }
         this.userRight = authorities.stream()

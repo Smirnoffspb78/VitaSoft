@@ -9,27 +9,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
-@ControllerAdvice
+@RestControllerAdvice
 @Slf4j
 public class ExceptionHandlerAdvice {
 
-    @ResponseBody
     @ExceptionHandler({EntityNotFoundException.class, HttpRequestMethodNotSupportedException.class, UsernameNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String notFoundExceptionException(RuntimeException e) {
         return responseServer(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
-    @ResponseBody
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String notValidException(MethodArgumentNotValidException e) {
@@ -39,7 +37,6 @@ public class ExceptionHandlerAdvice {
         return responseServer(HttpStatus.BAD_REQUEST, errorMessages);
     }
 
-    @ResponseBody
     @ExceptionHandler(DuplicateRoleException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String badRequestException(RuntimeException e) {

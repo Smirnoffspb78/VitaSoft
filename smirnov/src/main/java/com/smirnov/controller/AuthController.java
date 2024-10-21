@@ -3,7 +3,7 @@ package com.smirnov.controller;
 
 import com.smirnov.dto.get.LoginPasswordDTO;
 import com.smirnov.dto.get.Token;
-import com.smirnov.services.security.UserAccountService;
+import com.smirnov.services.security.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,15 +21,15 @@ import javax.security.auth.login.AccountNotFoundException;
  * Контроллер аккаунта.
  */
 @RestController
-@RequestMapping("/user-account")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 @Slf4j
-public class UserAccountController {
+public class AuthController {
 
     /**
      * Сервисный слой аккаунта.
      */
-    private final UserAccountService userAccountService;
+    private final AuthService authService;
 
 
     /**
@@ -42,7 +42,7 @@ public class UserAccountController {
     public Token loginAccount(@RequestBody LoginPasswordDTO loginPassword) {
         try {
             log.info("POST: /user-account/login");
-            return userAccountService.loginAccount(loginPassword.getLogin(), loginPassword.getPassword());
+            return authService.loginAccount(loginPassword.getLogin(), loginPassword.getPassword());
         } catch (AccountNotFoundException e) {
             log.error("Введены неверные логин или пароль");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());

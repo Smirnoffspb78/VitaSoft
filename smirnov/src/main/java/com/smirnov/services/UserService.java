@@ -36,6 +36,7 @@ public class UserService {
      *
      * @return список пользователей
      */
+    @Transactional(readOnly = true)
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(this::mapUser)
@@ -47,6 +48,7 @@ public class UserService {
      *
      * @return список пользователей
      */
+    @Transactional(readOnly = true)
     public List<UserDTO> getUsersByName(String name) {
         return userRepository.findByNameContainingIgnoreCase(name).stream()
                 .map(this::mapUser)
@@ -60,19 +62,15 @@ public class UserService {
      * @param id идентификатор пользователя
      */
     public void addOperatorRight(Integer id) {
-        UserRole userRole = new UserRole();
-        userRole.setUserRight(ROLE_OPERATOR);
-        User user = getUserById(id);
-        if (user.getRolesUser().contains(userRole)) {
-            throw new DuplicateRoleException(id);
-        }
-        user.getRolesUser().add(userRole);
+        getUserById(id).addRole(ROLE_OPERATOR);
     }
+
 
     public User getUserById(Integer id) {
         return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(User.class, id));
     }
 
+    @Transactional(readOnly = true)
     public User getUserByLogin(String username){
         return userRepository.findByLogin(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));

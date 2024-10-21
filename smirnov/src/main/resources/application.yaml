@@ -13,8 +13,8 @@ spring:
       ddl-auto: validate
     open-in-view: true
     output:
-      ansi:
-        enabled=ALWAYS:
+        ansi:
+          enabled: ALWAYS
   liquibase:
     enabled: true
   change-log:
@@ -24,9 +24,7 @@ spring:
 page:
   size: 5
 
-#logging:
-#  level:
-#    root: INFO
+logging:
   file:
     name: LogVitaSoft
 

@@ -21,7 +21,7 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
      * @param userId Идентификатор пользователя
      * @return Заявка
      */
-    Optional<Request> findByIdAndStatusAndUser_Id(Long id, RequestStatus status, Integer userId);
+    Optional<Request> findByIdAndStatusAndUser_id(Long id, RequestStatus status, Integer userId);
 
     /**
      * Возвращает заявку по идентификатору и статусу заявки
