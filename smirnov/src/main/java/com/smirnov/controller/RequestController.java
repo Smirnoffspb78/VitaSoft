@@ -95,7 +95,7 @@ public class RequestController {
                                                       Pageable pageable) {
         log.info("GET: /requests/search/{}?page={}&sorting={}", userId,page, sorting);
         Page<RequestDTO> pageRequest = requestService.getAllByUser(pageable, sorting, userId);
-        log.info("{}. Получена страница {} размером {} элементов", HttpStatus.OK, pageable.getPageNumber(), pageable.getPageSize());
+        log.info("{}. Получена страница № {}", HttpStatus.OK, pageable.getPageNumber());
         return pageRequest;
     }
 
@@ -160,7 +160,7 @@ public class RequestController {
     public void rejectRequest(@PathVariable("id") Long id) {
         log.info("POST: /requests/{}/reject", id);
         requestService.rejectRequest(id);
-        log.info("Заявка с id {} отклонена", id);
+        log.info("{}. Заявка с id {} отклонена", HttpStatus.NO_CONTENT, id);
     }
 
     /**
@@ -178,6 +178,6 @@ public class RequestController {
                                  @RequestParam(name = "userId") Integer userId) {
         log.info("POST: /requests/{}/edit?userId={}", id, userId);
         requestService.editDraftRequest(id, requestCreateDTO, userId);
-        log.info("Заявка с id {} изменена", id);
+        log.info("{}. Заявка с id {} изменена", HttpStatus.NO_CONTENT, id);
     }
 }

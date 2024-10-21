@@ -12,8 +12,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import com.smirnov.configuration.JWTConfiguration;
 import com.smirnov.dto.get.UserDetailsCustom;
-import com.smirnov.enums.RolesUser;
-import lombok.RequiredArgsConstructor;
+import com.smirnov.enums.UserRight;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -63,7 +62,7 @@ public class JwtSecurityService {
                         new JWTClaimsSet.Builder()
                                 .subject(user.getUsername()) // идентификатор пользователя subject
                                 .claim("id", user.getId().toString())
-                                .claim("roles", user.getRolesUser().toString())
+                                .claim("roles", user.getUserRight().toString())
                                 .issueTime(new Date()) // время выдачи токена
                                 .expirationTime(new Date(System.currentTimeMillis() + jwtSecretExpiration * 10000))
                                 .build().toJSONObject()));
@@ -99,9 +98,9 @@ public class JwtSecurityService {
         return claims.getSubject();
     }
 
-    public RolesUser getRoles(String token) throws BadJOSEException, ParseException, JOSEException {
+    public UserRight getRoles(String token) throws BadJOSEException, ParseException, JOSEException {
         JWTClaimsSet claims = extractClaims(token);
-        return RolesUser.valueOf(claims.getClaim("roles").toString());
+        return UserRight.valueOf(claims.getClaim("roles").toString());
     }
 
     public Object getId(String token) throws BadJOSEException, ParseException, JOSEException {

@@ -1,6 +1,6 @@
 package com.smirnov.entity;
 
-import com.smirnov.enums.RolesUser;
+import com.smirnov.enums.UserRight;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -26,7 +26,7 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
-public class Role {
+public class UserRole {
 
     /**
      * Идентификатор роли.
@@ -34,5 +34,5 @@ public class Role {
     @Id
     @Enumerated(value = EnumType.STRING)
     @Column(name = "name")
-    private RolesUser rolesUser;
+    private UserRight userRight;
 }

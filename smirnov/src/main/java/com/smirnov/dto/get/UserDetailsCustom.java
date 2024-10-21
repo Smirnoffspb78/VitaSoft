@@ -1,6 +1,6 @@
 package com.smirnov.dto.get;
 
-import com.smirnov.enums.RolesUser;
+import com.smirnov.enums.UserRight;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -18,7 +18,7 @@ public class UserDetailsCustom extends User {
 
     @EqualsAndHashCode.Include
     private final Integer id;
-    private final Set<RolesUser> rolesUser;
+    private final Set<UserRight> userRight;
 
     /**
      * Calls the more complex constructor with all boolean arguments set to {@code true}.
@@ -32,9 +32,9 @@ public class UserDetailsCustom extends User {
         if (authorities.isEmpty()){
             throw new IllegalArgumentException("Список ролей не может быть пустым");
         }
-        this.rolesUser = authorities.stream()
+        this.userRight = authorities.stream()
                 .map(GrantedAuthority::getAuthority)
-                .map(RolesUser::valueOf)
+                .map(UserRight::valueOf)
                 .collect(Collectors.toSet());
         this.id = id;
     }

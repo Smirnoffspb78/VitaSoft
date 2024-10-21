@@ -5,7 +5,7 @@ import com.smirnov.dto.get.RequestDTO;
 import com.smirnov.entity.Request;
 import com.smirnov.entity.User;
 import com.smirnov.enums.RequestStatus;
-import com.smirnov.enums.RolesUser;
+import com.smirnov.enums.UserRight;
 import com.smirnov.exception.EntityNotFoundException;
 import com.smirnov.repository.RequestRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,8 +22,8 @@ import static com.smirnov.enums.RequestStatus.ACCEPTED;
 import static com.smirnov.enums.RequestStatus.DRAFT;
 import static com.smirnov.enums.RequestStatus.REJECTED;
 import static com.smirnov.enums.RequestStatus.SENT;
-import static com.smirnov.enums.RolesUser.ROLE_OPERATOR;
-import static com.smirnov.enums.RolesUser.ROLE_USER;
+import static com.smirnov.enums.UserRight.ROLE_OPERATOR;
+import static com.smirnov.enums.UserRight.ROLE_USER;
 import static org.springframework.data.domain.Sort.by;
 
 /**
@@ -142,9 +142,9 @@ public class RequestService {
                 .map(request -> mapRequestDTO(request, ROLE_USER));
     }
 
-    private RequestDTO mapRequestDTO(Request request, RolesUser rolesUser) {
+    private RequestDTO mapRequestDTO(Request request, UserRight userRight) {
         User user = request.getUser();
-        String message = rolesUser == ROLE_OPERATOR ? mapMessage(request.getMessage()) : request.getMessage();
+        String message = userRight == ROLE_OPERATOR ? mapMessage(request.getMessage()) : request.getMessage();
         return RequestDTO.builder()
                 .userLogin(user.getLogin())
                 .userName(user.getName())

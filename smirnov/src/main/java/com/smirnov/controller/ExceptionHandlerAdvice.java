@@ -6,6 +6,7 @@ import com.smirnov.exception.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -22,7 +23,7 @@ import static java.lang.String.format;
 public class ExceptionHandlerAdvice {
 
     @ResponseBody
-    @ExceptionHandler({EntityNotFoundException.class, HttpRequestMethodNotSupportedException.class})
+    @ExceptionHandler({EntityNotFoundException.class, HttpRequestMethodNotSupportedException.class, UsernameNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String notFoundExceptionException(RuntimeException e) {
         return responseServer(HttpStatus.NOT_FOUND, e.getMessage());

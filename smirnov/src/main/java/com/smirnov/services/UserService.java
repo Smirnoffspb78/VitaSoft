@@ -1,26 +1,21 @@
 package com.smirnov.services;
 
 import com.smirnov.dto.get.UserDTO;
-import com.smirnov.dto.get.UserDetailsCustom;
-import com.smirnov.entity.Role;
+import com.smirnov.entity.UserRole;
 import com.smirnov.entity.User;
 import com.smirnov.exception.DuplicateRoleException;
 import com.smirnov.exception.EntityNotFoundException;
 import com.smirnov.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.smirnov.enums.RolesUser.ROLE_OPERATOR;
+import static com.smirnov.enums.UserRight.ROLE_OPERATOR;
 
 /**
  * Сервисный слой для работы с пользователями.
@@ -29,7 +24,7 @@ import static com.smirnov.enums.RolesUser.ROLE_OPERATOR;
 @Transactional
 @RequiredArgsConstructor
 @Slf4j
-public class UserService implements UserDetailsService {
+public class UserService {
 
     /**
      * Репозиторий пользователей.
@@ -65,36 +60,22 @@ public class UserService implements UserDetailsService {
      * @param id идентификатор пользователя
      */
     public void addOperatorRight(Integer id) {
-        Role role = new Role();
-        role.setRolesUser(ROLE_OPERATOR);
+        UserRole userRole = new UserRole();
+        userRole.setUserRight(ROLE_OPERATOR);
         User user = getUserById(id);
-        if (user.getRolesUser().contains(role)) {
+        if (user.getRolesUser().contains(userRole)) {
             throw new DuplicateRoleException(id);
         }
-        user.getRolesUser().add(role);
+        user.getRolesUser().add(userRole);
     }
 
     public User getUserById(Integer id) {
         return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(User.class, id));
     }
 
-    /**
-     * Возвращает пользователя по логину.
-     *
-     * @param username логин пользователя
-     * @return пользователь в контексте Spring Security
-     */
-    @Override
-    public UserDetailsCustom loadUserByUsername(String username) {
-        User user = userRepository.findByLogin(username)
+    public User getUserByLogin(String username){
+        return userRepository.findByLogin(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        Set<GrantedAuthority> grantedAuthorities = user.getRolesUser().stream()
-                .map(Role::getRolesUser)
-                .map(Enum::name)
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toSet());
-        log.info("Аутентифицирован user с login: {}. Роль: {}", user.getLogin(), grantedAuthorities);
-        return new UserDetailsCustom(username, user.getPassword(), grantedAuthorities, user.getId());
     }
 
     private UserDTO mapUser(User user){
@@ -102,7 +83,7 @@ public class UserService implements UserDetailsService {
                 .login(user.getLogin())
                 .name(user.getName())
                 .rolesUser(user.getRolesUser().stream()
-                        .map(Role::toString)
+                        .map(UserRole::toString)
                         .collect(Collectors.toSet()))
                 .build();
     }

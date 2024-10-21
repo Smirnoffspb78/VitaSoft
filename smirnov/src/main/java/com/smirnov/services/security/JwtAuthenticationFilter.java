@@ -4,7 +4,6 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.proc.BadJOSEException;
 import com.smirnov.dto.get.UserDetailsCustom;
 import com.smirnov.exception.JWTValidException;
-import com.smirnov.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,7 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtSecurityService jwtSecurityService;
 
-    private final UserService userService;
+    private final UserAuthenticatedService userAuthenticatedService;
 
     /**
      * Проверяет, имеет ли запрос валидный Bearer-токен.
@@ -56,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throw new JWTValidException("Не удалось извлечь токен");
         }
         if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetailsCustom userDetails = userService.loadUserByUsername(userName);
+            UserDetailsCustom userDetails = this.userAuthenticatedService.loadUserByUsername(userName);
             try {
                 if (jwtSecurityService.isTokenValid(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
