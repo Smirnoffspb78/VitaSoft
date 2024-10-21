@@ -3,7 +3,6 @@ package com.smirnov.services;
 import com.smirnov.dto.get.UserDTO;
 import com.smirnov.entity.UserRole;
 import com.smirnov.entity.User;
-import com.smirnov.exception.DuplicateRoleException;
 import com.smirnov.exception.EntityNotFoundException;
 import com.smirnov.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,20 +36,9 @@ public class UserService {
      * @return список пользователей
      */
     @Transactional(readOnly = true)
-    public List<UserDTO> getAllUsers() {
-        return userRepository.findAll().stream()
-                .map(this::mapUser)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Возвращает список всех пользователей.
-     *
-     * @return список пользователей
-     */
-    @Transactional(readOnly = true)
-    public List<UserDTO> getUsersByName(String name) {
-        return userRepository.findByNameContainingIgnoreCase(name).stream()
+    public List<UserDTO> getUsers(String name) {
+        List<User> users = name == null ? userRepository.findAll() : userRepository.findByNameContainingIgnoreCase(name);
+        return users.stream()
                 .map(this::mapUser)
                 .collect(Collectors.toList());
     }
@@ -71,12 +59,12 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public User getUserByLogin(String username){
+    public User getUserByLogin(String username) {
         return userRepository.findByLogin(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
-    private UserDTO mapUser(User user){
+    private UserDTO mapUser(User user) {
         return UserDTO.builder()
                 .login(user.getLogin())
                 .name(user.getName())

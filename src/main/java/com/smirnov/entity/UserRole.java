@@ -23,6 +23,7 @@ import javax.persistence.Table;
 @Table(name = "roles")
 @Getter
 @Setter
+@ToString
 @EqualsAndHashCode
 @Immutable
 public class UserRole {
