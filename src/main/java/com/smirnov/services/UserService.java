@@ -69,7 +69,7 @@ public class UserService {
                 .login(user.getLogin())
                 .name(user.getName())
                 .rolesUser(user.getRolesUser().stream()
-                        .map(UserRole::toString)
+                        .map(userRole -> userRole.getUserRight().toString())
                         .collect(Collectors.toSet()))
                 .build();
     }
