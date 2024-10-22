@@ -21,6 +21,11 @@ public enum UserRight {
         }
     };
 
+    /**
+     * Возвращает текст сообщения.
+     * @param text Текст сообщения.
+     * @return Текст сообщения
+     */
     public String getTextRequest(String text) {
         return text;
     }
