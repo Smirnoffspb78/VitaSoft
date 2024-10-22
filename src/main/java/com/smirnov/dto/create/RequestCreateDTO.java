@@ -16,4 +16,9 @@ public final class RequestCreateDTO {
     @NotBlank(message = "message не должен быть null и не должен быть пустым")
     private String message;
 
+    /**
+     * Идентификатор пользователя.
+     */
+    @NotNull(message = "userId не должен быть null")
+    private Integer userId;
 }

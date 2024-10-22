@@ -51,9 +51,9 @@ public class RequestService {
      * Отправляет заявку на рассмотрение по ее идентификатору.
      */
     public void submitRequestReview(Long id, Integer userId) {
-        Request request = requestRepository.findByIdAndStatusAndUser_id(id, DRAFT, userId)
-                .orElseThrow(() -> new EntityNotFoundException(Request.class, id));
-        request.setStatus(SENT);
+        requestRepository.findByIdAndStatusAndUser_id(id, DRAFT, userId)
+                .orElseThrow(() -> new EntityNotFoundException(Request.class, id))
+                .setStatus(SENT);
     }
 
     /**
@@ -62,8 +62,7 @@ public class RequestService {
      * @param id Идентификатор заявки.
      */
     public void acceptRequest(Long id) {
-        Request request = getRequestIdStatus(id, SENT);
-        request.setStatus(ACCEPTED);
+        getRequestIdStatus(id, SENT).setStatus(ACCEPTED);
     }
 
     /**
@@ -72,8 +71,7 @@ public class RequestService {
      * @param id Идентификатор заявки.
      */
     public void rejectRequest(Long id) {
-        Request request = getRequestIdStatus(id, SENT);
-        request.setStatus(REJECTED);
+        getRequestIdStatus(id, SENT).setStatus(REJECTED);
     }
 
     /**
@@ -93,10 +91,10 @@ public class RequestService {
      *
      * @return Идентификатор созданной заявки
      */
-    public Long createRequest(String message, Integer userId) {
-        final User user = userService.getUserById(userId);
+    public Long createRequest(RequestCreateDTO requestCreateDTO) {
+        final User user = userService.getUserById(requestCreateDTO.getUserId());
         Request request = new Request();
-        request.setMessage(message);
+        request.setMessage(requestCreateDTO.getMessage());
         request.setUser(user);
         request.setStatus(DRAFT);
         request.setCreatedAt(LocalDateTime.now());
@@ -105,39 +103,28 @@ public class RequestService {
 
     /**
      * Редактирует заявку по ее идентификатору.
-     * @param id Идентификатор заявки
+     *
+     * @param id               Идентификатор заявки
      * @param requestCreateDTO заявка
-     * @param userId идентификатор пользователя
      */
-    public void editDraftRequest(Long id, RequestCreateDTO requestCreateDTO, Integer userId) {
-        Request request = requestRepository.findByIdAndStatusAndUser_id(id, DRAFT, userId)
-                .orElseThrow(() -> new EntityNotFoundException(Request.class, id));
-        request.setMessage(requestCreateDTO.getMessage());
+    public void editDraftRequest(Long id, RequestCreateDTO requestCreateDTO) {
+        requestRepository.findByIdAndStatusAndUser_id(id, DRAFT, requestCreateDTO.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException(Request.class, id))
+                .setMessage(requestCreateDTO.getMessage());
     }
 
     /**
-     * Возвращает частично список заявок, отправленных на рассмотрение.
+     * Возвращает список заявок, отправленных на рассмотрение.
      *
      * @return Список заявок
      */
     @Transactional(readOnly = true)
-    public Page<RequestDTO> getPageRequest(Pageable pageable, Sort.Direction sorting) {
-        return requestRepository.findByStatus(SENT, PageRequest.of(pageable.getPageNumber(), size,
-                        by(sorting, Request.Fields.createdAt)))
-                .map(request -> mapRequestDTO(request, ROLE_OPERATOR));
-    }
-
-    /**
-     * Возвращает частично список заявок по имени пользователя, отправленных на рассмотрение.
-     *
-     * @return Список заявок
-     */
-    @Transactional(readOnly = true)
-    public Page<RequestDTO> getPageRequestByName(Pageable pageable, Sort.Direction sorting, String name) {
-        return requestRepository
-                .findByStatusAndUser_nameContainingIgnoreCase(SENT, name, PageRequest.of(pageable.getPageNumber(), size,
-                        by(sorting, Request.Fields.createdAt)))
-                .map(request -> mapRequestDTO(request, ROLE_OPERATOR));
+    public Page<RequestDTO> getPageRequest(int pageNumber, Sort.Direction sorting, String name) {
+        Page<Request> requestPage = name == null ? requestRepository.findByStatus(SENT, PageRequest.of(pageNumber, size,
+                by(sorting, Request.Fields.createdAt))) :
+                requestRepository.findByStatusAndUser_nameContainingIgnoreCase(SENT, name, PageRequest.of(pageNumber, size,
+                        by(sorting, Request.Fields.createdAt)));
+        return requestPage.map(request -> mapRequestDTO(request, ROLE_OPERATOR));
     }
 
     /**
@@ -146,9 +133,9 @@ public class RequestService {
      * @return Список заявок
      */
     @Transactional(readOnly = true)
-    public Page<RequestDTO> getAllByUser(Pageable pageable, Sort.Direction sorting, Integer userId) {
+    public Page<RequestDTO> getAllByUser(int pageNumber, Sort.Direction sorting, Integer userId) {
         return requestRepository
-                .findByUser_id(userId, PageRequest.of(pageable.getPageNumber(), size,
+                .findByUser_id(userId, PageRequest.of(pageNumber, size,
                         by(sorting, Request.Fields.createdAt)))
                 .map(request -> mapRequestDTO(request, ROLE_USER));
     }

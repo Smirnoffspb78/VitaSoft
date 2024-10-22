@@ -35,7 +35,7 @@ public class LoggingUserController {
 
     @AfterReturning("execution(* com.smirnov.controller.UserController.updateUserBeforeOperator(..))")
     public void logAfterUpdateUserBeforeOperator(JoinPoint joinPoint) {
-        Integer id = (Integer) joinPoint.getArgs()[0]; // Получаем id из аргументов метода
+        Integer id = (Integer) joinPoint.getArgs()[0];
         log.info("{}. Пользователю с id {} выданы права оператора", HttpStatus.NO_CONTENT, id);
     }
 }

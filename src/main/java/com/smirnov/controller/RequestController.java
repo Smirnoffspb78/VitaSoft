@@ -22,6 +22,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+import static java.util.Objects.isNull;
+
+/**
+ * Контроллер для работы с заявками.
+ */
 @RestController
 @RequestMapping("/requests")
 @RequiredArgsConstructor
@@ -56,46 +61,32 @@ public class RequestController {
      */
     @GetMapping
     @PreAuthorize("hasRole('ROLE_OPERATOR')")
-    public Page<RequestDTO> getPageRequest(@RequestParam("page") int page,
+    public Page<RequestDTO> getPageRequest(@RequestParam("pageNumber") int pageNumber,
                                            @RequestParam("sorting") Sort.Direction sorting,
-                                           Pageable pageable) {
-        log.info("GET: /requests?page={}&sorting={}", page, sorting);
-        Page<RequestDTO> pageRequest = requestService.getPageRequest(pageable, sorting);
-        log.info("{}. Получена страница {} размером {} элементов", HttpStatus.OK, pageable.getPageNumber(), pageable.getPageSize());
+                                           @RequestParam(value = "name", required = false) String name) {
+        if (isNull(name)) {
+            log.info("GET: /requests?pageNumber={}&sorting={}", pageNumber, sorting);
+        } else {
+            log.info("GET: /requests?pageNumber={}&sorting={}&name={}", pageNumber, sorting, name);
+        }
+        Page<RequestDTO> pageRequest = requestService.getPageRequest(pageNumber, sorting, name);
+        log.info("{}. Получена страница № {}", HttpStatus.OK, pageNumber);
         return pageRequest;
     }
 
     /**
      * Возвращает страницу с заявками, направленные на рассмотрение.
      *
-     * @return Список DTO записей
+     * @return Список DTO записей.
      */
-    @GetMapping("/search/{name}")
-    @PreAuthorize("hasRole('ROLE_OPERATOR')")
-    public Page<RequestDTO> getPageRequestBysUserName(@RequestParam("page") int page,
-                                                      @RequestParam("sorting") Sort.Direction sorting,
-                                                      @PathVariable("name") String name,
-                                                      Pageable pageable) {
-        log.info("GET: /requests/search/{}?page={}&sorting={}", name,page, sorting);
-        Page<RequestDTO> pageRequest = requestService.getPageRequestByName(pageable, sorting, name);
-        log.info("{}. Получена страница {} размером {} элементов", HttpStatus.OK, pageable.getPageNumber(), pageable.getPageSize());
-        return pageRequest;
-    }
-
-    /**
-     * Возвращает страницу с заявками, направленные на рассмотрение.
-     *
-     * @return Список DTO записей
-     */
-    @GetMapping("/search/user/{id}")
+    @GetMapping("/user/{id}")
     @PreAuthorize("hasRole('ROLE_USER') and authentication.principal.id == #userId")
-    public Page<RequestDTO> getPageByUser(@RequestParam("page") int page,
-                                                      @RequestParam("sorting") Sort.Direction sorting,
-                                                      @PathVariable("id") Integer userId,
-                                                      Pageable pageable) {
-        log.info("GET: /requests/search/{}?page={}&sorting={}", userId,page, sorting);
-        Page<RequestDTO> pageRequest = requestService.getAllByUser(pageable, sorting, userId);
-        log.info("{}. Получена страница № {}", HttpStatus.OK, pageable.getPageNumber());
+    public Page<RequestDTO> getPageByUser(@PathVariable("id") Integer userId,
+                                          @RequestParam("pageNumber") int pageNumber,
+                                          @RequestParam("sorting") Sort.Direction sorting) {
+        log.info("GET: /requests/user/{}?pageNumber={}&sorting={}", userId, pageNumber, sorting);
+        Page<RequestDTO> pageRequest = requestService.getAllByUser(pageNumber, sorting, userId);
+        log.info("{}. Получена страница № {}", HttpStatus.OK, pageNumber);
         return pageRequest;
     }
 
@@ -105,28 +96,26 @@ public class RequestController {
      * - USER
      *
      * @param requestCreateDTO заявка
-     * @param userId           Идентификатор пользователя
      * @return Номер новой заявки
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ROLE_USER') and authentication.principal.id == #userId")
-    public Long createRequest(@RequestBody @Valid RequestCreateDTO requestCreateDTO,
-                              @RequestParam(name = "userId") Integer userId) {
-        log.info("POST: /requests?userId={}", userId);
-        Long requestId = requestService.createRequest(requestCreateDTO.getMessage(), userId);
+    @PreAuthorize("hasRole('ROLE_USER') and authentication.principal.id == #requestCreateDTO.userId")
+    public Long createRequest(@RequestBody @Valid RequestCreateDTO requestCreateDTO) {
+        log.info("POST: /requests");
+        Long requestId = requestService.createRequest(requestCreateDTO);
         log.info("{}. Заявка с id {} создана", HttpStatus.CREATED, requestId);
         return requestId;
     }
 
     /**
-     * Отправляет заявку на рассмотрение, если она в статусе DRAFT по ее идентификатору.
+     * Отправляет заявку на рассмотрение по ее идентификатору.
      * Уровень доступа:
-     * - USER, чей id совпадает с User в заявке
+     * - USER, чей id совпадает с userId в заявке
      *
      * @param id Идентификатор заявки.
      */
-    @PutMapping(value = "/{id}/submit-review")
+    @PutMapping("/{id}/submit-review")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ROLE_USER') and authentication.principal.id == #userId")
     public void submitReview(@PathVariable("id") Long id, @RequestParam(name = "userId") Integer userId) {
@@ -166,18 +155,17 @@ public class RequestController {
     /**
      * Редактирует заявку пользователя.
      * Уровень доступа:
-     * - USER, чей id совпадает с заявкой
+     * - USER, чей id совпадает с userId в заявке заявкой
      *
      * @param id               Идентификатор заявки
      * @param requestCreateDTO Новая заявка
      */
-    @PutMapping(value = "/{id}/edit")
+    @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('ROLE_USER') and authentication.principal.id == #userId")
-    public void editDraftRequest(@PathVariable("id") Long id, @RequestBody @Valid RequestCreateDTO requestCreateDTO,
-                                 @RequestParam(name = "userId") Integer userId) {
-        log.info("POST: /requests/{}/edit?userId={}", id, userId);
-        requestService.editDraftRequest(id, requestCreateDTO, userId);
+    @PreAuthorize("hasRole('ROLE_USER') and authentication.principal.id == #requestCreateDTO.userId")
+    public void editDraftRequest(@PathVariable("id") Long id, @RequestBody @Valid RequestCreateDTO requestCreateDTO) {
+        log.info("POST: /requests/{}", id);
+        requestService.editDraftRequest(id, requestCreateDTO);
         log.info("{}. Заявка с id {} изменена", HttpStatus.NO_CONTENT, id);
     }
 }
