@@ -5,6 +5,8 @@ import com.nimbusds.jose.proc.BadJOSEException;
 import com.smirnov.dto.get.UserDetailsCustom;
 import com.smirnov.exception.JWTValidException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -23,6 +25,7 @@ import java.text.ParseException;
  */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtSecurityService jwtSecurityService;
@@ -52,7 +55,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             userName = jwtSecurityService.getSubject(jwt);
         } catch (BadJOSEException | ParseException | JOSEException e) {
-            throw new JWTValidException("Не удалось извлечь токен");
+            response.setContentType("application/json; charset=UTF-8");
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().write("Проверьте правильность введенного токена");
+            log.error("{}. Проверьте правильность введенного токена", HttpStatus.UNAUTHORIZED);
+            return;
         }
         if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetailsCustom userDetails = this.userAuthenticatedService.loadUserByUsername(userName);

@@ -61,7 +61,7 @@ public class RequestController {
      *
      * @return Список DTO записей
      */
-    @GetMapping
+    @GetMapping("/sent")
     @PreAuthorize("hasRole('ROLE_OPERATOR')")
     public Page<RequestDTO> getPageRequest(@RequestParam("pageNumber") int pageNumber,
                                            @RequestParam("sorting") Sort.Direction sorting,
