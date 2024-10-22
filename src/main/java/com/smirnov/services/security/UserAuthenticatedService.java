@@ -37,7 +37,6 @@ public class UserAuthenticatedService implements UserDetailsService {
                 .map(Enum::name)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
-        log.info("Аутентифицирован user с login: {}. Роль: {}", user.getLogin(), grantedAuthorities);
         return new UserDetailsCustom(username, user.getPassword(), grantedAuthorities, user.getId());
     }
 }

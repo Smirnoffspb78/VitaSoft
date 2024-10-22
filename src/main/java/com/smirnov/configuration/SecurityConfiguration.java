@@ -1,6 +1,7 @@
 package com.smirnov.configuration;
 
 
+import com.smirnov.services.security.BasicAuthenticationEntryPoint;
 import com.smirnov.services.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +34,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    private final BasicAuthenticationEntryPoint basicAuthenticationEntryPoint;
 
     /**
      * Аутентифицирует пользователя через данные из БД
@@ -68,6 +71,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/auth/login").permitAll()
                 .anyRequest().authenticated()
+                .and()
+                .httpBasic()
+                .authenticationEntryPoint(basicAuthenticationEntryPoint)
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()

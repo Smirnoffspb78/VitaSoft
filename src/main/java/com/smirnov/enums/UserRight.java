@@ -1,7 +1,7 @@
 package com.smirnov.enums;
 
 /**
- * Роли пользователей
+ * Роли пользователей.
  */
 public enum UserRight {
     ROLE_ADMIN,

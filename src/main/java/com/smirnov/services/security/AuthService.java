@@ -45,4 +45,5 @@ public class AuthService {
         token.setRefreshToken(jwtSecurityService.generateRefreshToken());
         return token;
     }
+
 }

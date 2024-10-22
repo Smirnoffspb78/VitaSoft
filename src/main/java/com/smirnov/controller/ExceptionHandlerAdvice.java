@@ -3,6 +3,7 @@ package com.smirnov.controller;
 
 import com.smirnov.exception.DuplicateRoleException;
 import com.smirnov.exception.EntityNotFoundException;
+import com.smirnov.exception.ExtractCredentialsException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -37,7 +38,7 @@ public class ExceptionHandlerAdvice {
         return responseServer(HttpStatus.BAD_REQUEST, errorMessages);
     }
 
-    @ExceptionHandler(DuplicateRoleException.class)
+    @ExceptionHandler({DuplicateRoleException.class, ExtractCredentialsException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String badRequestException(RuntimeException e) {
         return responseServer(HttpStatus.BAD_REQUEST, e.getMessage());
