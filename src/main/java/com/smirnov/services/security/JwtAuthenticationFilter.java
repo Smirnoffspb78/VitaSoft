@@ -3,7 +3,6 @@ package com.smirnov.services.security;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.proc.BadJOSEException;
 import com.smirnov.dto.get.UserDetailsCustom;
-import com.smirnov.exception.JWTValidException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

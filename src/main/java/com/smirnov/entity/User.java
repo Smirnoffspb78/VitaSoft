@@ -19,8 +19,6 @@ import javax.validation.constraints.Pattern;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.smirnov.enums.UserRight.ROLE_OPERATOR;
-
 /**
  * Пользователь.
  */

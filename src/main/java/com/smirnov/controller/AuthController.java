@@ -1,9 +1,9 @@
 package com.smirnov.controller;
 
 
-import com.smirnov.services.security.BasicAuth;
 import com.smirnov.dto.get.Token;
 import com.smirnov.services.security.AuthService;
+import com.smirnov.services.security.BasicAuth;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -12,9 +12,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
-
-import javax.security.auth.login.AccountNotFoundException;
 
 
 /**
