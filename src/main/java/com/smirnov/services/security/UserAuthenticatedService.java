@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 public class UserAuthenticatedService implements UserDetailsService {
 
     private final UserService userService;
+
     /**
      * Возвращает пользователя по логину.
      *

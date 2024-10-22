@@ -8,13 +8,10 @@ spring:
     username: ${LOGIN_POSTGRE}
     password: ${PASSWORD_POSTGRE}
   jpa:
-    show: true
+    show-sql: true
     hibernate:
       ddl-auto: validate
     open-in-view: true
-    output:
-        ansi:
-          enabled: ALWAYS
   liquibase:
     enabled: true
   change-log:

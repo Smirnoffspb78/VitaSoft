@@ -31,11 +31,12 @@ public class UserController {
      * Выводит список пользователей.
      * Уровень доступа:
      * - ADMIN
+     *
      * @return Список пользователей
      */
     @GetMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public List<UserDTO> getUsers(@RequestParam(name = "name", required = false) String name){
+    public List<UserDTO> getUsers(@RequestParam(name = "name", required = false) String name) {
         return userService.getUsers(name);
     }
 
@@ -43,6 +44,7 @@ public class UserController {
      * Выдает пользователю права оператора.
      * Уровень доступа:
      * - ADMIN
+     *
      * @param id Идентификатор пользователя
      */
     @PutMapping("{id}/grant-operator-right")
