@@ -1,0 +1,26 @@
+
+databaseChangeLog:
+  #Создание таблицы ролей
+  - include:
+      file: db/changelog/changeset/CreateTableRoles.sql
+  #Создание таблицы пользователей
+  - include:
+      file: db/changelog/changeset/CreateTableUsers.sql
+  #Создание таблицы пользователей-ролей
+  - include:
+      file: db/changelog/changeset/CreateTableUser_Role.sql
+  #Создание таблицы заявок
+  - include:
+      file: db/changelog/changeset/CreateTableRequests.sql
+  #Добавление ролей в таблицу
+  - include:
+      file: db/changelog/changeset/InsertRoles.sql
+  #Добавление пользователей в таблицу
+  - include:
+      file: db/changelog/changeset/InsertUsers.sql
+  #Добавление связей роли-пользователи в таблицу
+  - include:
+      file: db/changelog/changeset/InsertUserRole.sql
+  #Добавление заявок в таблицу
+  - include:
+      file: db/changelog/changeset/InsertRequest.sql
