@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * Контроллер для работы с пользователями.
+ */
 @RestController
 @Slf4j
 @RequiredArgsConstructor

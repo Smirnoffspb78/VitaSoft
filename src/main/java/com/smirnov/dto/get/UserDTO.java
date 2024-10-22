@@ -6,6 +6,9 @@ import lombok.Setter;
 
 import java.util.Set;
 
+/**
+ * DTO для отправки информации о пользователе.
+ */
 @Getter
 @Setter
 @Builder

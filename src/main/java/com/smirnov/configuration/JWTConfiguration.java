@@ -16,6 +16,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Настраивает обработку JWT
+ */
 @Configuration
 public class JWTConfiguration {
 
@@ -28,11 +31,22 @@ public class JWTConfiguration {
         this.jwtSecret = jwtSecret;
     }
 
+    /**
+     * Шифрует содержимое JWT.
+     *
+     * @return Зашифрованный ключ
+     * @throws KeyLengthException
+     */
     @Bean
     public JWEEncrypter encrypt() throws KeyLengthException {
         return new DirectEncrypter(jwtSecret.getBytes());
     }
 
+    /**
+     * Настраивает шифрование ключа.
+     *
+     * @return Бин для обработки JWT
+     */
     @Bean
     public ConfigurableJWTProcessor<SimpleSecurityContext> jwtProcessor() {
         ConfigurableJWTProcessor<SimpleSecurityContext> jwtProcessor = new DefaultJWTProcessor<>();

@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 /**
- * Извлекает учетные данные из заголовков для
+ * Извлекает учетные данные из заголовков для аутентификации.
  */
 @Component
 public class BasicAuth {

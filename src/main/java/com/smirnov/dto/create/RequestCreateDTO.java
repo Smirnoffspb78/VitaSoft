@@ -6,6 +6,9 @@ import lombok.Setter;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+/**
+ * DTO для создания заявки.
+ */
 @Getter
 @Setter
 public final class RequestCreateDTO {

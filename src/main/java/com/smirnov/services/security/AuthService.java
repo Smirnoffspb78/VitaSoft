@@ -11,11 +11,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.security.auth.login.AccountNotFoundException;
-
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 
+/**
+ * Сервисный слой для авторизации пользователя.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -31,16 +32,14 @@ public class AuthService {
      * @param password Пароль
      * @return Токен
      */
-    public Token loginAccount(String login, String password) throws AccountNotFoundException {
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(login, password));
+    public Token loginAccount(String login, String password) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, password));
         getContext().setAuthentication(authentication);
         Token token = new Token();
         try {
             token.setAccessToken(jwtSecurityService.generateToken((UserDetailsCustom) authentication.getPrincipal()));
         } catch (JOSEException e) {
-            log.error("Не правильно введены логин или пароль");
-            throw new AccountNotFoundException("Не правильно введены логин или пароль");
+            throw new IllegalArgumentException("Неправильно введены логин или пароль");
         }
         token.setRefreshToken(jwtSecurityService.generateRefreshToken());
         return token;

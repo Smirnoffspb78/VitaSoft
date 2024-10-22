@@ -40,22 +40,24 @@ public class RequestController {
 
 
     /**
-     * Позволяет посмотреть информацию о заявке.
+     * Позволяет посмотреть информацию о заявке по ее идентификатору.
      *
      * @param id Идентификатор заявки
      * @return Заявка
      */
-    @GetMapping(value = "/{id}")
+    @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_OPERATOR')")
     public RequestDTO watchRequest(@PathVariable("id") Long id) {
-        log.info("POST: /{}", id);
+        log.info("GET: /requests/{}", id);
         RequestDTO requestDTO = requestService.getRequest(id);
-        log.info("{}. Получена заявка с id {}", HttpStatus.OK, id);
+        log.info("{}. Получена заявка с id {}.", HttpStatus.OK, id);
         return requestDTO;
     }
 
     /**
-     * Возвращает страницу с заявками, направленных на рассмотрение.
+     * Возвращает страницу с заявками, которые направлены на рассмотрение.
+     * Уровень доступа:
+     * - OPERATOR
      *
      * @return Список DTO записей
      */
@@ -70,23 +72,25 @@ public class RequestController {
             log.info("GET: /requests?pageNumber={}&sorting={}&name={}", pageNumber, sorting, name);
         }
         Page<RequestDTO> pageRequest = requestService.getPageRequest(pageNumber, sorting, name);
-        log.info("{}. Получена страница № {}", HttpStatus.OK, pageNumber);
+        log.info("{}. Получена страница № {} с заявками на рассмотрение.", HttpStatus.OK, pageNumber);
         return pageRequest;
     }
 
     /**
-     * Возвращает страницу с заявками, направленные на рассмотрение.
+     * Возвращает все заявки пользователя по его идентификатору.
+     * Уровень доступа:
+     * -USER
      *
      * @return Список DTO записей.
      */
-    @GetMapping("/user/{id}")
+    @GetMapping("/user/{userId}")
     @PreAuthorize("hasRole('ROLE_USER') and authentication.principal.id == #userId")
-    public Page<RequestDTO> getPageByUser(@PathVariable("id") Integer userId,
+    public Page<RequestDTO> getPageByUser(@PathVariable("userId") Integer userId,
                                           @RequestParam("pageNumber") int pageNumber,
                                           @RequestParam("sorting") Sort.Direction sorting) {
         log.info("GET: /requests/user/{}?pageNumber={}&sorting={}", userId, pageNumber, sorting);
         Page<RequestDTO> pageRequest = requestService.getAllByUser(pageNumber, sorting, userId);
-        log.info("{}. Получена страница № {}", HttpStatus.OK, pageNumber);
+        log.info("{}. Получена страница c заявками № {} пользователя с id {}.", HttpStatus.OK, pageNumber, userId);
         return pageRequest;
     }
 
@@ -104,7 +108,7 @@ public class RequestController {
     public Long createRequest(@RequestBody @Valid RequestCreateDTO requestCreateDTO) {
         log.info("POST: /requests");
         Long requestId = requestService.createRequest(requestCreateDTO);
-        log.info("{}. Заявка с id {} создана", HttpStatus.CREATED, requestId);
+        log.info("{}. Заявка с id {} создана.", HttpStatus.CREATED, requestId);
         return requestId;
     }
 
@@ -121,11 +125,13 @@ public class RequestController {
     public void submitReview(@PathVariable("id") Long id, @RequestParam(name = "userId") Integer userId) {
         log.info("POST: /requests/{}/submit-review/?userid={}", id, userId);
         requestService.submitRequestReview(id, userId);
-        log.info("{}. Заявка с id {} отправлена на рассмотрение", HttpStatus.NO_CONTENT, id);
+        log.info("{}. Заявка с id {} отправлена на рассмотрение.", HttpStatus.NO_CONTENT, id);
     }
 
     /**
      * Принимает заявку по ее идентификатору.
+     * Уровень доступа:
+     * - OPERATOR
      *
      * @param id Идентификатор заявки.
      */
@@ -140,6 +146,8 @@ public class RequestController {
 
     /**
      * Отклоняет заявку по ее идентификатору.
+     * Уровень доступа:
+     * - OPERATOR
      *
      * @param id Идентификатор заявки.
      */
@@ -155,7 +163,7 @@ public class RequestController {
     /**
      * Редактирует заявку пользователя.
      * Уровень доступа:
-     * - USER, чей id совпадает с userId в заявке заявкой
+     * - USER, чей id совпадает с userId в заявке
      *
      * @param id               Идентификатор заявки
      * @param requestCreateDTO Новая заявка

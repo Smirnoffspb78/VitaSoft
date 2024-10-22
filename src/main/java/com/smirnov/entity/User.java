@@ -71,9 +71,10 @@ public class User {
 
     /**
      * Добавляет новую роль пользователю.
+     *
      * @param userRight Роль пользователя
      */
-    public void addRole(UserRight userRight){
+    public void addRole(UserRight userRight) {
         UserRole userRole = new UserRole();
         userRole.setUserRight(userRight);
         if (rolesUser.contains(userRole)) {

@@ -33,8 +33,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
 
+    /**
+     * Фильтр для обработки запроса JWT токена.
+     */
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    /**
+     * Обработчик Basic аутентификации.
+     */
     private final BasicAuthenticationEntryPoint basicAuthenticationEntryPoint;
 
     /**

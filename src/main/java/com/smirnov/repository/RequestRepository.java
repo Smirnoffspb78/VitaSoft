@@ -51,7 +51,7 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
     Page<Request> findByUser_id(Integer userId, Pageable pageable);
 
     /**
-     * Возвращает страницу всех заявок, по имени/части имени и статусу
+     * Возвращает страницу всех заявок, по статусу, имени/части имени пользователя.
      *
      * @param name     Имя/Часть имени
      * @param status   Статус заявки

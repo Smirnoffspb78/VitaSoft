@@ -18,7 +18,7 @@ import javax.security.auth.login.AccountNotFoundException;
 
 
 /**
- * Контроллер аккаунта.
+ * Контроллер для работы с аккаунтом.
  */
 @RestController
 @RequestMapping("/auth")
@@ -36,20 +36,17 @@ public class AuthController {
 
     /**
      * Авторизует пользователя.
+     *
      * @return Токен пользователя
      */
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.CREATED)
     public Token loginAccount(@RequestHeader("Authorization") String authHeader) {
-        try {
-            String[] credentials = basicAuth.extractCredentials(authHeader);
-            String login = credentials[0];
-            String password = credentials[1];
-            log.info("POST: /auth/login.\n Аутентифицирован user с login: {}", login);
-            return authService.loginAccount(login, password);
-        } catch (AccountNotFoundException e) {
-            log.error("Введены неверные логин или пароль");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
+        String[] credentials = basicAuth.extractCredentials(authHeader);
+        String login = credentials[0];
+        String password = credentials[1];
+        Token token = authService.loginAccount(login, password);
+        log.info("POST: /auth/login.\n Аутентифицирован user с login: {}", login);
+        return token;
     }
 }
